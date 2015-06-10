@@ -76,7 +76,6 @@
 
             $ligaspielplan = $spielplan_html->find('table[class=content_table_std]', 1);
 
-
             $html_spielort = file_get_html($link_spielort_home);
             $content_table = $html_spielort->find('table[class=content_table_std]', 0);
             if(!is_null($content_table->find('span',0)))
@@ -109,6 +108,7 @@
                     $ergebnis = utf8_decode($ergebnis);
                     $zeit = utf8_decode($zeit);
 
+
                     if($heimrecht == 'A')
                     {
                         $html_spielort = file_get_html($link_gegner_spielstätte);
@@ -119,18 +119,20 @@
                         }
                         else
                         {
-                            $spielort = "";
+                            $spielort = " ";
                         }
 
                         $spielort = utf8_decode($spielort);
                         $spielort = str_replace("\r\n", "", $spielort);
 
+
                         /**update von ergebnissen*/
+
                         /**insert in Table spiele_team*/
                         $sql = 'Insert into spiele_' . $name . ' (id, home, away, ergebnis, ort, zeit)
                                     SELECT * FROM (SELECT 0,"' . $gegner . '","'. $team_name . '","'. $ergebnis . '","'. $spielort . '","'. $zeit . '") AS tmp
                                      WHERE NOT EXISTS(
-                                     SELECT home FROM spiele_' . $name .  ' WHERE home ="' . $gegner . '") Limit 1';
+                                     SELECT home FROM spiele_' . $name .  ' WHERE home ="' . $gegner . '" and away ="' . $team_name . '") Limit 1';
 
                         mysql_query($sql) or die("Anfrage failed");
                         $spielearray = array('home' => $gegner, 'away' => $team_name, 'ergebnis' => $ergebnis, 'spielort' => $spielort, 'zeit' => $zeit);
@@ -139,11 +141,13 @@
                     {
                         $spielort_home = utf8_decode($spielort_home);
                         $spielort_home = str_replace("\r\n", "", $spielort_home);
+
                         /**insert in Table spiele_team*/
                         $sql = 'Insert into spiele_' . $name . ' (id, home, away, ergebnis, ort, zeit)
                                     SELECT * FROM (SELECT 0,"' . $team_name . '","'. $gegner . '","'. $ergebnis . '","'. $spielort_home . '","'. $zeit . '") AS tmp
                                      WHERE NOT EXISTS(
-                                     SELECT away FROM spiele_' . $name .  ' WHERE away ="' . $gegner . '") Limit 1';
+                                     SELECT away FROM spiele_' . $name .  ' WHERE away ="' . $gegner . '" and home = "' . $team_name . '") Limit 1';
+
                         mysql_query($sql) or die("Anfrage failed");
                         $spielearray = array('home' => $team_name, 'away' => $gegner, 'ergebnis' => $ergebnis, 'spielort' => $spielort_home, 'zeit' => $zeit);
                     }
