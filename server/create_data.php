@@ -81,6 +81,10 @@
             if(!is_null($content_table->find('span',0)))
             {
                 $spielort_home = $content_table->find('span', 0 )->plaintext;
+                if(strpos($spielort_home, '?') !== false)
+                {
+                    $spielort_home = str_replace("?", "ss", $spielort_home);
+                }
             }
             else
             {
@@ -103,10 +107,15 @@
                     $ergebnis = $game_complete->find('a', 2)->plaintext;
 
                     //utf8 encoden
-                    $gegner = utf8_decode($gegner);
+                    /**$gegner = utf8_encode($gegner);
                     $team_name = utf8_decode($team_name);
                     $ergebnis = utf8_decode($ergebnis);
-                    $zeit = utf8_decode($zeit);
+                    $zeit = utf8_decode($zeit);*/
+
+                    $gegner = iconv("ISO-8859-1", "latin1", $gegner);
+                    $team_name = iconv("ISO-8859-1", "latin1", $team_name);
+                    $zeit = iconv("ISO-8859-1", "latin1", $zeit);
+                    $ergebnis = iconv("ISO-8859-1", "latin1", $ergebnis);
 
 
                     if($heimrecht == 'A')
@@ -121,10 +130,8 @@
                         {
                             $spielort = " ";
                         }
-
-                        $spielort = utf8_decode($spielort);
+                        $spielort = iconv("ISO-8859-1", "latin1", $spielort);
                         $spielort = str_replace("\r\n", "", $spielort);
-
 
                         /**update von ergebnissen*/
 
@@ -135,11 +142,11 @@
                                      SELECT home FROM spiele_' . $name .  ' WHERE home ="' . $gegner . '" and away ="' . $team_name . '") Limit 1';
 
                         mysql_query($sql) or die("Anfrage failed");
-                        $spielearray = array('home' => $gegner, 'away' => $team_name, 'ergebnis' => $ergebnis, 'spielort' => $spielort, 'zeit' => $zeit);
+                        $spielearray = array('home' => utf8_decode($gegner), 'away' => utf8_decode($team_name), 'ergebnis' => $ergebnis, 'spielort' => utf8_decode($spielort), 'zeit' => utf8_decode($zeit));
                     }
                     else
                     {
-                        $spielort_home = utf8_decode($spielort_home);
+                        $spielort_home = iconv("ISO-8859-1", "latin1", $spielort_home);
                         $spielort_home = str_replace("\r\n", "", $spielort_home);
 
                         /**insert in Table spiele_team*/
@@ -149,7 +156,7 @@
                                      SELECT away FROM spiele_' . $name .  ' WHERE away ="' . $gegner . '" and home = "' . $team_name . '") Limit 1';
 
                         mysql_query($sql) or die("Anfrage failed");
-                        $spielearray = array('home' => $team_name, 'away' => $gegner, 'ergebnis' => $ergebnis, 'spielort' => $spielort_home, 'zeit' => $zeit);
+                        $spielearray = array('home' => utf8_decode($team_name), 'away' => utf8_decode($gegner), 'ergebnis' => $ergebnis, 'spielort' => utf8_decode($spielort_home), 'zeit' => utf8_decode($zeit));
                     }
 
                     array_push($spiele, $spielearray);
@@ -162,6 +169,7 @@
 
     array_push($json, $teams);
     array_push($json, $spiele);
+
 
     echo json_encode($json);
 
