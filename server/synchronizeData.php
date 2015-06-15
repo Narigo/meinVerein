@@ -17,7 +17,7 @@
 
     $sql = "Select * from " . $teamname;
     $result = mysql_query($sql);
-
+    
     while($row = mysql_fetch_array($result))
     {
         $teamarray = array("id" => $row['id'], "team" => $row["mannschaft"]);

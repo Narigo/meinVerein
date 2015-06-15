@@ -17,6 +17,7 @@
     $name = str_replace("/", "", $name);
     $name = str_replace(" ", "", $name);
     $name = str_replace("ü", "ue", $name);
+    $name = strtolower($name);
 
 
     $teams = array();
